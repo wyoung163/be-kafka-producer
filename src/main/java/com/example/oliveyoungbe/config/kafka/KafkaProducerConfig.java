@@ -42,7 +42,6 @@ public class KafkaProducerConfig {
         return new DefaultKafkaProducerFactory<>(config);
     }
 
-
     // TicketRequest KafkaTemplate 설정
     @Bean
     public KafkaTemplate<String, TicketRequest> ticketRequestKafkaTemplate() {
