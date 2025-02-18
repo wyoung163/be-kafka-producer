@@ -11,6 +11,7 @@ ENV SPRING_PROFILES_ACTIVE=prod
 
 RUN chmod +x gradlew
 RUN apk add --no-cache findutils
-RUN ./gradlew clean build
+RUN ./gradlew clean
+RUN ./gradlew build
 
-CMD ["java", "-jar", "build/libs/oliveyoung-be-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "build/libs/oliveyoung-be-0.0.1-SNAPSHOT.jar", "-spring.profiles.active=${SPRING_PROFILES_ACTIVE}"]
