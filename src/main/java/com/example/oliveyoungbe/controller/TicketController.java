@@ -44,7 +44,6 @@ public class TicketController {
         response.addCookie(cookie);
 
         ticketRequest.setUuid(uuid);
-        ticketRequest.setRegion("ap-northeast-2");
 
         kafkaProducerService.sendRequestMessage(ticketRequest);
         return ResponseEntity.ok().build();
@@ -68,7 +67,6 @@ public class TicketController {
     @PostMapping("/booking")
     public ResponseEntity<String> bookingTicket(@RequestBody TicketBooking ticketbooking, @CookieValue(value="uuid", required = true) String uuid) {
         ticketbooking.setUuid(uuid);
-        ticketbooking.setRegion("ap-northeast-2");
 
         kafkaProducerService.sendBookingMessage(ticketbooking);
         return ResponseEntity.ok().build();
