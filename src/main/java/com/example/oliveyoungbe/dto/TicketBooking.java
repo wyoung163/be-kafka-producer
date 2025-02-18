@@ -13,5 +13,5 @@ public class TicketBooking {
     private String timeSlot;
     @Nullable
     private String region;
-    private Timestamp timestamp;
+    private long timestamp;
 }

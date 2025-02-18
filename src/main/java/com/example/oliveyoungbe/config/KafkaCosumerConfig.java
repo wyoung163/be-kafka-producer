@@ -1,4 +1,4 @@
-package com.example.oliveyoungbe.config.kafka;
+package com.example.oliveyoungbe.config;
 
 import com.example.oliveyoungbe.dto.TicketRequest;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -11,6 +11,7 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import java.util.HashMap;
@@ -57,6 +58,7 @@ public class KafkaCosumerConfig {
         ConcurrentKafkaListenerContainerFactory<String, TicketRequest> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(pushEntityConsumerFactory());
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         return factory;
     }
 }
