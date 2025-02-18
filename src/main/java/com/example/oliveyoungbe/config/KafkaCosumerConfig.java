@@ -1,5 +1,6 @@
 package com.example.oliveyoungbe.config;
 
+import com.example.oliveyoungbe.dto.TicketBooking;
 import com.example.oliveyoungbe.dto.TicketRequest;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -27,15 +28,24 @@ public class KafkaCosumerConfig {
     private String groupId;
 
     @Bean
-    public ConsumerFactory<String, TicketRequest> pushEntityConsumerFactory() {
-        JsonDeserializer<TicketRequest> deserializer = gcmPushEntityJsonDeserializer();
+    public ConsumerFactory<String, TicketRequest> ticketRequestConsumerFactory() {
+        JsonDeserializer<TicketRequest> deserializer = gcmTicketRequestJsonDeserializer();
         return new DefaultKafkaConsumerFactory<>(
-                cosumerFactoryConfig(deserializer),
+                consumerRequestFactoryConfig(deserializer),
                 new StringDeserializer(),
                 deserializer);
     }
 
-    private Map<String, Object> cosumerFactoryConfig(JsonDeserializer<TicketRequest> deserializer) {
+    @Bean
+    public ConsumerFactory<? super String, ? super TicketBooking> ticketBookingConsumerFactory() {
+        JsonDeserializer<TicketBooking> deserializer = gcmTicketBookingJsonDeserializer();
+        return new DefaultKafkaConsumerFactory<>(
+                consumerBookingFactoryConfig(deserializer),
+                new StringDeserializer(),
+                deserializer);
+    }
+
+    private Map<String, Object> consumerRequestFactoryConfig(JsonDeserializer<TicketRequest> deserializer) {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBootstrapServer);
         configProps.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
@@ -44,8 +54,25 @@ public class KafkaCosumerConfig {
         return configProps;
     }
 
-    private JsonDeserializer<TicketRequest> gcmPushEntityJsonDeserializer() {
+    private Map<String, Object> consumerBookingFactoryConfig(JsonDeserializer<TicketBooking> deserializer) {
+        Map<String, Object> configProps = new HashMap<>();
+        configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBootstrapServer);
+        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, deserializer);
+        return configProps;
+    }
+
+    private JsonDeserializer<TicketRequest> gcmTicketRequestJsonDeserializer() {
         JsonDeserializer<TicketRequest> deserializer = new JsonDeserializer<>(TicketRequest.class);
+        deserializer.setRemoveTypeHeaders(false);
+        deserializer.addTrustedPackages("*");
+        deserializer.setUseTypeMapperForKey(true);
+        return deserializer;
+    }
+
+    private JsonDeserializer<TicketBooking> gcmTicketBookingJsonDeserializer() {
+        JsonDeserializer<TicketBooking> deserializer = new JsonDeserializer<>(TicketBooking.class);
         deserializer.setRemoveTypeHeaders(false);
         deserializer.addTrustedPackages("*");
         deserializer.setUseTypeMapperForKey(true);
@@ -54,10 +81,20 @@ public class KafkaCosumerConfig {
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, TicketRequest>
-    kafkaListenerContainerFactory() {
+    kafkaListenerRequestContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, TicketRequest> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(pushEntityConsumerFactory());
+        factory.setConsumerFactory(ticketRequestConsumerFactory());
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
+        return factory;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, TicketBooking>
+    kafkaListenerBookingContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, TicketBooking> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(ticketBookingConsumerFactory());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         return factory;
     }
