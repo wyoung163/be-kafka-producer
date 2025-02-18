@@ -3,10 +3,15 @@ package com.example.oliveyoungbe.controller;
 import com.example.oliveyoungbe.dto.TicketBooking;
 import com.example.oliveyoungbe.dto.TicketRequest;
 import com.example.oliveyoungbe.service.KafkaProducerService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/tickets")
@@ -30,7 +35,17 @@ public class TicketController {
           - exception:
      */
     @PostMapping("/request")
-    public ResponseEntity<String> requestTicket(@RequestBody TicketRequest ticketRequest) {
+    public ResponseEntity<String> requestTicket(@RequestBody TicketRequest ticketRequest, HttpServletResponse response) {
+        String uuid = UUID.randomUUID().toString(); // 사용자 식별자
+        Cookie cookie = new Cookie("uuid", uuid);
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(60 * 60 * 24);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+
+        ticketRequest.setUuid(uuid);
+        ticketRequest.setRegion("ap-northeast-2");
+
         kafkaProducerService.sendRequestMessage(ticketRequest);
         return ResponseEntity.ok().build();
     }
@@ -51,7 +66,10 @@ public class TicketController {
           - exception:
      */
     @PostMapping("/booking")
-    public ResponseEntity<String> bookingTicket(@RequestBody TicketBooking ticketbooking) {
+    public ResponseEntity<String> bookingTicket(@RequestBody TicketBooking ticketbooking, @CookieValue(value="uuid", required = true) String uuid) {
+        ticketbooking.setUuid(uuid);
+        ticketbooking.setRegion("ap-northeast-2");
+
         kafkaProducerService.sendBookingMessage(ticketbooking);
         return ResponseEntity.ok().build();
     }
