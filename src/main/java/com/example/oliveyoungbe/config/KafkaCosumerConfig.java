@@ -1,4 +1,4 @@
-package com.example.oliveyoungbe.config.kafka;
+package com.example.oliveyoungbe.config;
 
 import com.example.oliveyoungbe.dto.TicketRequest;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
