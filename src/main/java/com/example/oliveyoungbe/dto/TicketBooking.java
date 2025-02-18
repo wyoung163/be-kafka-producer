@@ -11,7 +11,5 @@ public class TicketBooking {
     private String uuid;
     private String eventId;
     private String timeSlot;
-    @Nullable
-    private String region;
-    private long timestamp;
+    private String timestamp;
 }

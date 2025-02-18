@@ -10,7 +10,5 @@ public class TicketRequest {
     @Nullable
     private String uuid;
     private String eventId;
-    @Nullable
-    private String region;
-    private long timestamp;
+    private String timestamp;
 }

@@ -63,7 +63,7 @@ public class KafkaConsumerService {
     private boolean addToWaitingList(TicketRequest ticketRequest) {
         ZSetOperations<String, String> zSetOperations = redisTemplate.opsForZSet();
         String uuid = ticketRequest.getUuid();
-        long timestamp = ticketRequest.getTimestamp();
+        long timestamp = Long.parseLong(ticketRequest.getTimestamp());
         if (uuid != null && zSetOperations != null) {
             Boolean success = zSetOperations.add(WAITING_LIST_KEY, uuid, (double) timestamp);
             if (Boolean.TRUE.equals(success)) {
