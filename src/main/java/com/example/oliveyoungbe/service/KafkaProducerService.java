@@ -21,13 +21,13 @@ import java.util.concurrent.ExecutionException;
 @RequiredArgsConstructor
 public class KafkaProducerService {
 
-    @Value("$kafka.topic.typeRequest")
+    @Value("${kafka.topic.typeRequest}")
     private String ticketRequestTopic;
 
-    @Value("$kafka.topic.typeBooking")
+    @Value("${kafka.topic.typeBooking}")
     private String ticketBookingTopic;
 
-    @Value("$kafka.partition.num")
+    @Value("${kafka.partition.num}")
     private String partitionNum;
 
     private final KafkaTemplate<String, TicketRequest> ticketRequestKafkaTemplate;
