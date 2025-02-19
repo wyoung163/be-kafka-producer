@@ -12,15 +12,11 @@ pipeline {
         SQ_PROJECT_KEY = 'sonarqube-project-key'
     }
 
-    tools {
-        jdk 'JDK21'
-    }
-
     stages {
         stage('Checkout') {
             steps {
                 script {
-                    git branch: 'dev', credentialsId: GIT_CREDENTIALS, url: REPO_URL
+                    git branch: 'feature/ticket/kafka-producer', credentialsId: GIT_CREDENTIALS, url: REPO_URL
                 }
             }
         }
