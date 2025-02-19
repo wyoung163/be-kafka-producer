@@ -27,11 +27,13 @@ pipeline {
                     def scannerHome = tool 'sonarqube-scanner';
                     withSonarQubeEnv(credentialsId: SQ_CREDENTIALS, installationName: 'sonarqube') {
                         withCredentials([string(credentialsId: SQ_PROJECT_KEY, variable: 'PROJECT_KEY')]) {
+                        sh './gradlew build'
                         sh """
                             ${scannerHome}/bin/sonar-scanner \
                             -Dsonar.projectKey=${PROJECT_KEY} \
-                            -Dsonar.projectName="Your Project Name" \
+                            -Dsonar.projectName=${PROJECT_KEY} \
                             -Dsonar.sources=src \
+                            -Dsonar.java.binaries=build/classes/java/main \
                             -Dsonar.sourceEncoding=UTF-8
                         """
                         }
