@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/tickets")
@@ -35,7 +36,7 @@ public class TicketController {
           - exception:
      */
     @PostMapping("/request")
-    public ResponseEntity<String> requestTicket(@RequestBody TicketRequest ticketRequest, HttpServletResponse response) {
+    public ResponseEntity<String> requestTicket(@RequestBody TicketRequest ticketRequest, HttpServletResponse response) throws ExecutionException, InterruptedException {
         String uuid = UUID.randomUUID().toString(); // 사용자 식별자
         Cookie cookie = new Cookie("uuid", uuid);
         cookie.setHttpOnly(true);
@@ -65,7 +66,7 @@ public class TicketController {
           - exception:
      */
     @PostMapping("/booking")
-    public ResponseEntity<String> bookingTicket(@RequestBody TicketBooking ticketbooking, @CookieValue(value="uuid", required = true) String uuid) {
+    public ResponseEntity<String> bookingTicket(@RequestBody TicketBooking ticketbooking, @CookieValue(value="uuid", required = true) String uuid) throws ExecutionException, InterruptedException {
         ticketbooking.setUuid(uuid);
 
         kafkaProducerService.sendBookingMessage(ticketbooking);
