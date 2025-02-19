@@ -1,4 +1,4 @@
-FROM openjdk:21
+FROM openjdk:21-jdk-slim
 
 WORKDIR /app
 COPY . .
@@ -10,7 +10,7 @@ ENV KAFKA_BOOKING_TOPIC_NAME=ticketBooking
 ENV SPRING_PROFILES_ACTIVE=prod
 
 RUN chmod +x gradlew
-RUN apk add --no-cache findutils
+RUN apt update && apt-get install findutils -y
 RUN ./gradlew clean
 RUN ./gradlew build
 

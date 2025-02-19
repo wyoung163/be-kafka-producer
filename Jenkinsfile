@@ -8,13 +8,36 @@ pipeline {
         AWS_ACCOUNT_ID = '796973504685'
         ECR_REPO_NAME = 'server/kafka-producer'
         ECR_CREDENTIALS = 'aws-ecr-credential'
+        SQ_CREDENTIALS = 'sonarqube-credential'
+        SQ_PROJECT_KEY = 'sonarqube-project-key'
     }
 
     stages {
         stage('Checkout') {
             steps {
                 script {
-                    git branch: 'dev', credentialsId: GIT_CREDENTIALS, url: REPO_URL
+                    git branch: 'feature/ticket/kafka-producer', credentialsId: GIT_CREDENTIALS, url: REPO_URL
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'sonarqube-scanner';
+                    withSonarQubeEnv(credentialsId: SQ_CREDENTIALS, installationName: 'sonarqube') {
+                        withCredentials([string(credentialsId: SQ_PROJECT_KEY, variable: 'PROJECT_KEY')]) {
+                        sh './gradlew build'
+                        sh """
+                            ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=${PROJECT_KEY} \
+                            -Dsonar.projectName=${PROJECT_KEY} \
+                            -Dsonar.sources=src \
+                            -Dsonar.java.binaries=build/classes/java/main \
+                            -Dsonar.sourceEncoding=UTF-8
+                        """
+                        }
+                    }
                 }
             }
         }

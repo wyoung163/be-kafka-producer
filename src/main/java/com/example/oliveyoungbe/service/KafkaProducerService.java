@@ -21,14 +21,14 @@ import java.util.concurrent.ExecutionException;
 @RequiredArgsConstructor
 public class KafkaProducerService {
 
-    @Value("$kafka.topic.typeRequest")
+    @Value("${kafka.topic.typeRequest}")
     private String ticketRequestTopic;
 
-    @Value("$kafka.topic.typeBooking")
+    @Value("${kafka.topic.typeBooking}")
     private String ticketBookingTopic;
 
-    @Value("$kafka.partition.num")
-    private int partitionNum;
+    @Value("${kafka.partition.num}")
+    private String partitionNum;
 
     private final KafkaTemplate<String, TicketRequest> ticketRequestKafkaTemplate;
 
@@ -54,7 +54,7 @@ public class KafkaProducerService {
 
     public void sendRequestMessage(TicketRequest ticketRequest) throws ExecutionException, InterruptedException {
         if(!checkTopicExistence(ticketRequestTopic)) {
-            createTopic(ticketRequestTopic, partitionNum);
+            createTopic(ticketRequestTopic, Integer.parseInt(partitionNum));
         }
 
         Message<TicketRequest> message = MessageBuilder
@@ -91,7 +91,7 @@ public class KafkaProducerService {
      */
     public void sendBookingMessage(TicketBooking ticketBooking) throws ExecutionException, InterruptedException {
         if(!checkTopicExistence(ticketRequestTopic)) {
-            createTopic(ticketRequestTopic, partitionNum);
+            createTopic(ticketRequestTopic, Integer.parseInt(partitionNum));
         }
 
         Message<TicketBooking> message = MessageBuilder
