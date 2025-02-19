@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.2'
     id 'io.spring.dependency-management' version '1.1.7'
+    id "org.sonarqube" version "6.0.1.5171"
 }
 
 group = 'com.example'
@@ -9,7 +10,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -42,5 +43,13 @@ tasks.named('test') {
 
 test {
     systemProperty 'spring.profiles.active', 'prod'
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", System.getenv('SONAR_PROJECT_KEY')
+        property "sonar.host.url", System.getenv('SONAR_HOST_URL')
+        property "sonar.login", System.getenv('SONAR_LOGIN')
+    }
 }
 
