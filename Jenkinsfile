@@ -8,6 +8,7 @@ pipeline {
         AWS_ACCOUNT_ID = '796973504685'
         ECR_REPO_NAME = 'server/kafka-producer'
         ECR_CREDENTIALS = 'aws-ecr-credential'
+        SQ_CREDENTIALS = "sonarqube-credential"
     }
 
     stages {
@@ -15,6 +16,16 @@ pipeline {
             steps {
                 script {
                     git branch: 'dev', credentialsId: GIT_CREDENTIALS, url: REPO_URL
+                }
+            }
+        }
+
+        stage('SonarQube Test') {
+            steps {
+                script {
+                    def scannerHome = tool 'sonarqube-scanner';
+                    withSonarQubeEnv(credentialsId: SQ_CREDENTIALS, installationName: sonarqube)
+                    sh "${scannerHome}/bin/sonar-scanner"
                 }
             }
         }
