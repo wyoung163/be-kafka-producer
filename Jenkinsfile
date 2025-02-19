@@ -12,6 +12,10 @@ pipeline {
         SQ_PROJECT_KEY = 'sonarqube-project-key'
     }
 
+    tools {
+        jdk 'JDK21'
+    }
+
     stages {
         stage('Checkout') {
             steps {
