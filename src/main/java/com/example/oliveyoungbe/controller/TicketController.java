@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +22,6 @@ import java.util.concurrent.ExecutionException;
 public class TicketController {
 
     private final KafkaProducerService kafkaProducerService;
-
     /*
         1. 예약 요청 API
         [POST] /tickets/request
