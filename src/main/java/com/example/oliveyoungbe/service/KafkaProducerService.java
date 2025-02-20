@@ -59,7 +59,7 @@ public class KafkaProducerService {
 
         Message<TicketRequest> message = MessageBuilder
                 .withPayload(ticketRequest)
-                .setHeader(KafkaHeaders.KEY, ticketBookingTopic + "_" + ticketRequest.getUuid())
+                .setHeader(KafkaHeaders.KEY, ticketRequestTopic + "_" + ticketRequest.getUuid())
                 .setHeader(KafkaHeaders.TOPIC, ticketRequestTopic)
                 .build();
 
