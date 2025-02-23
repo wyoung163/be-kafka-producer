@@ -2,21 +2,21 @@ pipeline {
     agent any
 
     environment {
-        REPO_URL = 'https://github.com/wyoung163/olive-young-be.git'
+        REPO_URL = 'https://github.com/snowducks/BE-kafka-producer.git'
         GIT_CREDENTIALS = 'github-credential'
         AWS_REGION = 'ap-northeast-2'
         AWS_ACCOUNT_ID = '796973504685'
         ECR_REPO_NAME = 'server/kafka-producer'
         ECR_CREDENTIALS = 'aws-ecr-credential'
         SQ_CREDENTIALS = 'sonarqube-credential'
-        SQ_PROJECT_KEY = 'sonarqube-project-key'
+        SQ_PROJECT_KEY = 'sq-kafka-producer-project-key'
     }
 
     stages {
         stage('Checkout') {
             steps {
                 script {
-                    git branch: 'feature/ticket/kafka-producer', credentialsId: GIT_CREDENTIALS, url: REPO_URL
+                    git branch: 'dev', credentialsId: GIT_CREDENTIALS, url: REPO_URL
                 }
             }
         }
@@ -27,6 +27,7 @@ pipeline {
                     def scannerHome = tool 'sonarqube-scanner';
                     withSonarQubeEnv(credentialsId: SQ_CREDENTIALS, installationName: 'sonarqube') {
                         withCredentials([string(credentialsId: SQ_PROJECT_KEY, variable: 'PROJECT_KEY')]) {
+                        sh 'chmod +x ./gradlew'
                         sh './gradlew build'
                         sh """
                             ${scannerHome}/bin/sonar-scanner \
