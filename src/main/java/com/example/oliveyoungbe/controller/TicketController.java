@@ -39,15 +39,11 @@ public class TicketController {
     @PostMapping("/request")
     public ResponseEntity<String> requestTicket(@RequestBody TicketRequest ticketRequest, HttpServletResponse response) throws ExecutionException, InterruptedException {
         String uuid = UUID.randomUUID().toString(); // 사용자 식별자
-//        Cookie cookie = new Cookie("uuid", uuid);
-//        cookie.setHttpOnly(true);
-//        cookie.setMaxAge(60 * 60 * 24);
-//        cookie.setPath("/");
-//        response.addCookie(cookie);
-
-        int maxAge = 60 * 60 * 24;
-        String cookieValue = String.format("uuid=%s; Max-Age=%d; Path=/; Secure; SameSite=None", uuid, maxAge);
-        response.setHeader("Set-Cookie", cookieValue);
+        Cookie cookie = new Cookie("uuid", uuid);
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(60 * 60 * 24);
+        cookie.setPath("/");
+        response.addCookie(cookie);
 
         ticketRequest.setUuid(uuid);
 
