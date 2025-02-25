@@ -39,19 +39,18 @@ public class TicketController {
           - exception:
      */
     @PostMapping("/request")
-    public ResponseEntity<Map<String ,String>> requestTicket(@RequestBody TicketRequest ticketRequest, HttpServletResponse response) throws ExecutionException, InterruptedException {
+    public ResponseEntity<Map<String, String>> requestTicket(@RequestBody TicketRequest ticketRequest, HttpServletResponse response) throws ExecutionException, InterruptedException {
         String uuid = UUID.randomUUID().toString(); // 사용자 식별자
         int maxAge = 60 * 60 * 24;
         String cookieValue = String.format("uuid=%s; Max-Age=%d; Path=/; SameSite=None", uuid, maxAge);
         response.setHeader("Set-Cookie", cookieValue);
 
         ticketRequest.setUuid(uuid);
-        
         Map<String, String> responseBody = new HashMap<>();
         responseBody.put("uuid", uuid);
 
         kafkaProducerService.sendRequestMessage(ticketRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(responseBody);
     }
 
     /*
@@ -70,7 +69,7 @@ public class TicketController {
           - exception:
      */
     @PostMapping("/booking")
-    public ResponseEntity<String> bookingTicket(@RequestBody TicketBooking ticketbooking, @CookieValue(value="uuid", required = true) String uuid) throws ExecutionException, InterruptedException {
+    public ResponseEntity<String> bookingTicket(@RequestBody TicketBooking ticketbooking, @CookieValue(value="uuid", required = false) String uuid) throws ExecutionException, InterruptedException {
         ticketbooking.setUuid(uuid);
 
         kafkaProducerService.sendBookingMessage(ticketbooking);
