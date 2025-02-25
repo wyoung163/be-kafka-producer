@@ -71,7 +71,7 @@ public class TicketController {
      */
     @PostMapping("/booking")
     public ResponseEntity<String> bookingTicket(@RequestBody TicketBooking ticketbooking, @CookieValue(value="uuid", required = false) String uuid) throws ExecutionException, InterruptedException {
-        ticketbooking.setUuid(uuid);
+        //ticketbooking.setUuid(uuid);
 
         kafkaProducerService.sendBookingMessage(ticketbooking);
         return ResponseEntity.ok().build();
