@@ -1,7 +1,7 @@
 package com.example.oliveyoungbe.config.kafka;
 
-import com.example.oliveyoungbe.dto.TicketBooking;
-import com.example.oliveyoungbe.dto.TicketRequest;
+import com.example.oliveyoungbe.dto.TicketBookingDto;
+import com.example.oliveyoungbe.dto.TicketRequestDto;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +24,7 @@ public class KafkaProducerConfig {
     private String kafkaBootstrapServer;
 
     @Bean
-    public ProducerFactory<String, TicketRequest> ticketRequestProducerFactory() {
+    public ProducerFactory<String, TicketRequestDto> ticketRequestProducerFactory() {
         Map<String, Object> config = new HashMap<>();
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBootstrapServer);
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -35,7 +35,7 @@ public class KafkaProducerConfig {
 
     // TicketBooking ProducerFactory 설정
     @Bean
-    public ProducerFactory<String, TicketBooking> ticketBookingProducerFactory() {
+    public ProducerFactory<String, TicketBookingDto> ticketBookingProducerFactory() {
         Map<String, Object> config = new HashMap<>();
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBootstrapServer);
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -46,13 +46,13 @@ public class KafkaProducerConfig {
 
     // TicketRequest KafkaTemplate 설정
     @Bean
-    public KafkaTemplate<String, TicketRequest> ticketRequestKafkaTemplate() {
+    public KafkaTemplate<String, TicketRequestDto> ticketRequestKafkaTemplate() {
         return new KafkaTemplate<>(ticketRequestProducerFactory());
     }
 
     // TicketBooking KafkaTemplate 설정
     @Bean
-    public KafkaTemplate<String, TicketBooking> ticketBookingKafkaTemplate() {
+    public KafkaTemplate<String, TicketBookingDto> ticketBookingKafkaTemplate() {
         return new KafkaTemplate<>(ticketBookingProducerFactory());
     }
 }

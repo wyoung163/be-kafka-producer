@@ -1,15 +1,11 @@
 package com.example.oliveyoungbe.controller;
 
-import com.example.oliveyoungbe.dto.TicketBooking;
-import com.example.oliveyoungbe.dto.TicketRequest;
+import com.example.oliveyoungbe.dto.TicketBookingDto;
+import com.example.oliveyoungbe.dto.TicketRequestDto;
 import com.example.oliveyoungbe.service.KafkaProducerService;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +33,7 @@ public class TicketController {
           - exception:
      */
     @PostMapping("/request")
-    public ResponseEntity<String> requestTicket(@RequestBody TicketRequest ticketRequest, HttpServletResponse response) throws ExecutionException, InterruptedException {
+    public ResponseEntity<String> requestTicket(@RequestBody TicketRequestDto ticketRequestDto, HttpServletResponse response) throws ExecutionException, InterruptedException {
         String uuid = UUID.randomUUID().toString(); // 사용자 식별자
         Cookie cookie = new Cookie("uuid", uuid);
         cookie.setHttpOnly(true);
@@ -45,9 +41,9 @@ public class TicketController {
         cookie.setPath("/");
         response.addCookie(cookie);
 
-        ticketRequest.setUuid(uuid);
+        ticketRequestDto.setUuid(uuid);
 
-        kafkaProducerService.sendRequestMessage(ticketRequest);
+        kafkaProducerService.sendRequestMessage(ticketRequestDto);
         return ResponseEntity.ok().build();
     }
 
@@ -67,7 +63,7 @@ public class TicketController {
           - exception:
      */
     @PostMapping("/booking")
-    public ResponseEntity<String> bookingTicket(@RequestBody TicketBooking ticketbooking, @CookieValue(value="uuid", required = true) String uuid) throws ExecutionException, InterruptedException {
+    public ResponseEntity<String> bookingTicket(@RequestBody TicketBookingDto ticketbooking, @CookieValue(value="uuid", required = true) String uuid) throws ExecutionException, InterruptedException {
         ticketbooking.setUuid(uuid);
 
         kafkaProducerService.sendBookingMessage(ticketbooking);
