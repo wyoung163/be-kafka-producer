@@ -1,10 +1,13 @@
 package com.example.oliveyoungbe.service;
 
-import com.example.oliveyoungbe.dto.TicketBooking;
-import com.example.oliveyoungbe.dto.TicketRequest;
+import com.example.oliveyoungbe.controller.TicketController;
+import com.example.oliveyoungbe.dto.TicketBookingDto;
+import com.example.oliveyoungbe.dto.TicketRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -30,9 +33,11 @@ public class KafkaProducerService {
     @Value("${kafka.partition.num}")
     private String partitionNum;
 
-    private final KafkaTemplate<String, TicketRequest> ticketRequestKafkaTemplate;
+    private static final Logger logger = LoggerFactory.getLogger(TicketController.class);
 
-    private final KafkaTemplate<String, TicketBooking> ticketBookingKafkaTemplate;
+    private final KafkaTemplate<String, TicketRequestDto> ticketRequestKafkaTemplate;
+
+    private final KafkaTemplate<String, TicketBookingDto> ticketBookingKafkaTemplate;
 
     private final AdminClient adminClient;
 
@@ -52,26 +57,30 @@ public class KafkaProducerService {
         }
      */
 
-    public void sendRequestMessage(TicketRequest ticketRequest) throws ExecutionException, InterruptedException {
-        if(!checkTopicExistence(ticketRequestTopic)) {
-            createTopic(ticketRequestTopic, Integer.parseInt(partitionNum));
-        }
-
-        Message<TicketRequest> message = MessageBuilder
-                .withPayload(ticketRequest)
-                .setHeader(KafkaHeaders.KEY, ticketRequestTopic + "_" + ticketRequest.getUuid())
-                .setHeader(KafkaHeaders.TOPIC, ticketRequestTopic)
-                .build();
-
-        CompletableFuture<SendResult<String, TicketRequest>> future = ticketRequestKafkaTemplate.send(message);
-
-        future.whenComplete((result, ex) -> {
-            if(ex == null) {
-                System.out.println("Producer success: " + result.getProducerRecord().value());
-            } else {
-                System.out.println("Producer failure: " + ex.getMessage());
+    public void sendRequestMessage(TicketRequestDto ticketRequestDto) throws ExecutionException, InterruptedException {
+        try {
+            if (!checkTopicExistence(ticketRequestTopic)) {
+                createTopic(ticketRequestTopic, Integer.parseInt(partitionNum));
             }
-        });
+
+            Message<TicketRequestDto> message = MessageBuilder
+                    .withPayload(ticketRequestDto)
+                    .setHeader(KafkaHeaders.KEY, ticketRequestTopic + "_" + ticketRequestDto.getUuid())
+                    .setHeader(KafkaHeaders.TOPIC, ticketRequestTopic)
+                    .build();
+
+            CompletableFuture<SendResult<String, TicketRequestDto>> future = ticketRequestKafkaTemplate.send(message);
+
+            future.whenComplete((result, ex) -> {
+                if (ex == null) {
+                    logger.info("Producer success: {}", result.getProducerRecord().value());
+                } else {
+                    logger.error("Producer failure: {}", ex.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            logger.error("Error occurred while sending message to Kafka Cluster", e);
+        }
     }
 
      /*
@@ -89,26 +98,30 @@ public class KafkaProducerService {
           "timestamp": "2025-02-13T12:00:00Z"
         }
      */
-    public void sendBookingMessage(TicketBooking ticketBooking) throws ExecutionException, InterruptedException {
-        if(!checkTopicExistence(ticketRequestTopic)) {
-            createTopic(ticketRequestTopic, Integer.parseInt(partitionNum));
-        }
-
-        Message<TicketBooking> message = MessageBuilder
-                .withPayload(ticketBooking)
-                .setHeader(KafkaHeaders.KEY, ticketBookingTopic + "_" + ticketBooking.getUuid())
-                .setHeader(KafkaHeaders.TOPIC, ticketBookingTopic)
-                .build();
-
-        CompletableFuture<SendResult<String, TicketBooking>> future = ticketBookingKafkaTemplate.send(message);
-
-        future.whenComplete((result, ex) -> {
-            if(ex == null) {
-                System.out.println("Producer success: " + result.getProducerRecord().value());
-            } else {
-                System.out.println("Producer failure: " + ex.getMessage());
+    public void sendBookingMessage(TicketBookingDto ticketBookingDto) throws ExecutionException, InterruptedException {
+        try {
+            if (!checkTopicExistence(ticketRequestTopic)) {
+                createTopic(ticketRequestTopic, Integer.parseInt(partitionNum));
             }
-        });
+
+            Message<TicketBookingDto> message = MessageBuilder
+                    .withPayload(ticketBookingDto)
+                    .setHeader(KafkaHeaders.KEY, ticketBookingTopic + "_" + ticketBookingDto.getUuid())
+                    .setHeader(KafkaHeaders.TOPIC, ticketBookingTopic)
+                    .build();
+
+            CompletableFuture<SendResult<String, TicketBookingDto>> future = ticketBookingKafkaTemplate.send(message);
+
+            future.whenComplete((result, ex) -> {
+                if (ex == null) {
+                    logger.info("Producer success: {}", result.getProducerRecord().value());
+                } else {
+                    logger.error("Producer failure: {}", ex.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            logger.error("Error occurred while sending message to Kafka Cluster", e);
+        }
     }
 
     private boolean checkTopicExistence(String topic) throws ExecutionException, InterruptedException {
