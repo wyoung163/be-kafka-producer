@@ -6,6 +6,8 @@ import com.example.oliveyoungbe.service.KafkaProducerService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +19,7 @@ import java.util.concurrent.ExecutionException;
 @RequiredArgsConstructor
 public class TicketController {
 
+    private static final Logger logger = LoggerFactory.getLogger(TicketController.class);
     private final KafkaProducerService kafkaProducerService;
     /*
         1. 예약 요청 API
@@ -43,7 +46,13 @@ public class TicketController {
 
         ticketRequestDto.setUuid(uuid);
 
+        logger.info("Request received for ticket request: eventId={}, timestamp={}, uuid={}",
+                ticketRequestDto.getEventId(), ticketRequestDto.getTimestamp(), uuid);
+
         kafkaProducerService.sendRequestMessage(ticketRequestDto);
+
+        logger.info("Ticket request successfully sent to kafka cluster with uuid={}", uuid);
+
         return ResponseEntity.ok().build();
     }
 
@@ -63,10 +72,16 @@ public class TicketController {
           - exception:
      */
     @PostMapping("/booking")
-    public ResponseEntity<String> bookingTicket(@RequestBody TicketBookingDto ticketbooking, @CookieValue(value="uuid", required = true) String uuid) throws ExecutionException, InterruptedException {
-        ticketbooking.setUuid(uuid);
+    public ResponseEntity<String> bookingTicket(@RequestBody TicketBookingDto ticketBookingDto, @CookieValue(value="uuid", required = true) String uuid) throws ExecutionException, InterruptedException {
+        ticketBookingDto.setUuid(uuid);
 
-        kafkaProducerService.sendBookingMessage(ticketbooking);
+        logger.info("Request received for ticket booking: eventId={}, timeslot={}, timestamp={}, uuid={}",
+                ticketBookingDto.getEventId(), ticketBookingDto.getTimeSlot(), ticketBookingDto.getTimestamp(), uuid);
+
+        kafkaProducerService.sendBookingMessage(ticketBookingDto);
+
+        logger.info("Booking request successfully sent to kafka cluster for uuid={}", uuid);
+
         return ResponseEntity.ok().build();
     }
 }
