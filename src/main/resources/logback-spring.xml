@@ -15,10 +15,19 @@
         </encoder>
     </appender>
 
+    <!-- 비동기 로깅을 위한 AsyncAppender 설정 -->
+    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="FILE" /> <!-- 실제 로그를 기록할 Appender -->
+        <queueSize>1024</queueSize> <!-- 대기 큐의 크기 -->
+        <discardingThreshold>0</discardingThreshold> <!-- 버퍼가 가득 찼을 때 버릴 이벤트 수 (0은 버리지 않음) -->
+        <includeCallerData>false</includeCallerData> <!-- 호출자 정보 포함 여부 -->
+    </appender>
+
     <!-- 로그 레벨 설정 -->
     <root level="INFO">
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="FILE" />
+        <appender-ref ref="ASYNC"/>
     </root>
 
 </configuration>
