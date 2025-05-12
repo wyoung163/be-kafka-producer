@@ -15,6 +15,35 @@
         </encoder>
     </appender>
 
+    <!-- 토픽 별로 로그 분리 -->
+    <appender name="TICKET_REQUEST_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/ticket_request.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/ticket_request.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <filter class="com.example.oliveyoungbe.config.logging.LoggingFilter">
+            <keyword>ticket request</keyword>
+        </filter>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="TICKET_BOOKING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/ticket_booking.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/ticket_booking.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <filter class="com.example.oliveyoungbe.config.logging.LoggingFilter">
+            <keyword>ticket booking</keyword>
+        </filter>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <!-- 비동기 로깅을 위한 AsyncAppender 설정 -->
     <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
         <appender-ref ref="FILE" /> <!-- 실제 로그를 기록할 Appender -->
@@ -27,6 +56,8 @@
     <root level="INFO">
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="FILE" />
+        <appender-ref ref="TICKET_REQUEST_FILE"/>
+        <appender-ref ref="TICKET_BOOKING_FILE"/>
         <appender-ref ref="ASYNC"/>
     </root>
 
